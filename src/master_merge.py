@@ -17,7 +17,7 @@ errCnt = 0
 
 for root, subdirs, files in os.walk(os.curdir):
     for f in files:
-        if f.endswith('.xlsx') and not (f == "master_table.xlsx" or f == "~$master_table.xlsx"):
+        if f.endswith('.xls') and not (f == "master_table.xls" or f == "~$master_table.xls"):
             try:
                 checkfile = open(os.path.join(root, f))
                 checkfile.close()
@@ -45,16 +45,35 @@ elif errCnt > 0:
 log_file.write(logMsg)
 log_file.close()
 
+# get header from each file excel
+header = pd.read_excel(targetF[0], header=None)
+header = header.loc[0:1]
+
+header2 = pd.read_excel(targetF[len(targetF) - 1], header=None)
+header2 = header2.loc[0:1]
+
+header[4][0] = header[4][0].replace("Page", "Page From")
+header2[4][0] = header2[4][0].replace("Page", "Page To")
+
+header[6][0] = header2[4][0]
+
 # Load all .xlsx to dataframes and concatenate into master dataframe
-dataframes = [pd.read_excel(t) for t in targetF]
+dataframes = []
+dataframes.append(header)
+for t in targetF:
+    dataframe = pd.read_excel(t, skiprows=[0,1], header=None)
+    dataframes.append(dataframe)
+
+# dataframes = [pd.read_excel(t, skiprows=[1,2], header=None) for t in targetF]
+# df_master = pd.concat(header)
 df_master = pd.concat(dataframes)
 
 # Exports a consolidated excel file 
-if os.path.exists('master_table.xlsx'):
+if os.path.exists('master_table.xls'):
     try:
-        mstFile = open('master_table.xlsx','r')
+        mstFile = open('master_table.xls','r')
         mstFile.close()
-        df_master.to_excel('master_table.xlsx', index = False)
+        df_master.to_excel('master_table.xls', index = False, header=False)
         print("\nMerge complete!")
     except PermissionError:
         errMsg = "\nERROR!!! UPDATE FAILED! Please close the master_table.xlsx file and run the script again."
@@ -62,6 +81,6 @@ if os.path.exists('master_table.xlsx'):
         # open('log.txt', 'a').write(errMsg)   
         open('log.txt', 'w').write(errMsg)
 else:
-    df_master.to_excel('master_table.xlsx', index = False)
+    df_master.to_excel('master_table.xls', index = False)
     print("\nMerge complete!")
             

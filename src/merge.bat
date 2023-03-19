@@ -1,2 +1,2 @@
-python master_merge.py %*
+env\Scripts\python.exe master_merge.py %*
 pause
