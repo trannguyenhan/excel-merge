@@ -15,6 +15,22 @@ validFiles = ""
 validCnt = 0
 errCnt = 0
 
+# extract header from list file excel
+def get_header(lst_target_excel):
+    # get header from each file excel
+    header = pd.read_excel(lst_target_excel[0], header=None)
+    header = header.loc[0:1]
+
+    header2 = pd.read_excel(lst_target_excel[len(lst_target_excel) - 1], header=None)
+    header2 = header2.loc[0:1]
+
+    header[4][0] = header[4][0].replace("Page", "Page From")
+    header2[4][0] = header2[4][0].replace("Page", "Page To")
+
+    header[6][0] = header2[4][0]
+
+    return header
+
 for root, subdirs, files in os.walk(os.curdir):
     for f in files:
         if f.endswith('.xls') and not (f == "master_table.xls" or f == "~$master_table.xls"):
@@ -45,21 +61,16 @@ elif errCnt > 0:
 log_file.write(logMsg)
 log_file.close()
 
-# get header from each file excel
-header = pd.read_excel(targetF[0], header=None)
-header = header.loc[0:1]
-
-header2 = pd.read_excel(targetF[len(targetF) - 1], header=None)
-header2 = header2.loc[0:1]
-
-header[4][0] = header[4][0].replace("Page", "Page From")
-header2[4][0] = header2[4][0].replace("Page", "Page To")
-
-header[6][0] = header2[4][0]
-
 # Load all .xlsx to dataframes and concatenate into master dataframe
 dataframes = []
-dataframes.append(header)
+
+try:
+    # get header from each file excel
+    header = get_header(targetF)
+    dataframes.append(header)
+except:
+    print("No header")
+
 for t in targetF:
     dataframe = pd.read_excel(t, skiprows=[0,1], header=None)
     dataframes.append(dataframe)

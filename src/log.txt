@@ -1,0 +1,9 @@
+Process executed at: 2023-03-19 16:20:44
+
+Files imported:
+  ./batdongsan-15032023-cho-thue-can-ho-chung-cu-page1.xls
+  ./batdongsan-15032023-cho-thue-can-ho-chung-cu-page2.xls
+
+Number of files imported = 2
+
+Import successful!
